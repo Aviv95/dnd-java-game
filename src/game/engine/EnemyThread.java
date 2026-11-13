@@ -23,16 +23,19 @@ public class EnemyThread implements Runnable {
     private final GameWorld world;
     private final AtomicBoolean isRunning;
     private final Random random = new Random();
+    private final int mapSize;
+
 
     private static final int VISION_RANGE = 5;
     private static final int MELEE_RANGE = 1;
 
-    public EnemyThread(Enemy enemy, PlayerCharacter player, GameMap map, GameWorld world, AtomicBoolean isRunning) {
+    public EnemyThread(Enemy enemy, PlayerCharacter player, GameMap map, GameWorld world, AtomicBoolean isRunning, int mapSize) {
         this.enemy = enemy;
         this.player = player;
         this.map = map;
         this.world = world;
         this.isRunning = isRunning;
+        this.mapSize = mapSize;
     }
 
     @Override
@@ -86,7 +89,8 @@ public class EnemyThread implements Runnable {
         GameLogger.log("Enemy thread stopped for enemy at " + enemy.getPosition());
     }
 
-    private boolean tryMoveWithLock(Position targetPos) {
+    boolean tryMoveWithLock(Position targetPos) {
+        if(!isInsideMap(targetPos)) return false;
         boolean locked = map.tryLockPosition(targetPos, 50);
         if (!locked) return false;
 
@@ -110,6 +114,11 @@ public class EnemyThread implements Runnable {
         int dRow = Integer.compare(to.getRow(), from.getRow());
         int dCol = Integer.compare(to.getCol(), from.getCol());
         return new Position(from.getRow() + dRow, from.getCol() + dCol);
+    }
+
+    private boolean isInsideMap(Position pos) {
+        return pos.getRow() >= 0 && pos.getRow() < mapSize
+                && pos.getCol() >= 0 && pos.getCol() < mapSize;
     }
 
     private Position getRandomAdjacentPosition(Position pos) {

@@ -58,7 +58,7 @@ public class Main {
 
             // create enemies
             MapPopulator.populateMap(world, mapSize, playerPos);
-            EnemyManager enemyManager = new EnemyManager(world.getEnemies(), player, map, world);
+            EnemyManager enemyManager = new EnemyManager(world.getEnemies(), player, map, world, mapSize);
             enemyManager.startAll();
 
 

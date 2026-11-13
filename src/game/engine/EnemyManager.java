@@ -21,14 +21,16 @@ public class EnemyManager {
     private final PlayerCharacter player;
     private final GameMap map;
     private final GameWorld world;
+    private final int mapSize;
 
-    public EnemyManager(List<Enemy> enemies, PlayerCharacter player, GameMap map, GameWorld world) {
+    public EnemyManager(List<Enemy> enemies, PlayerCharacter player, GameMap map, GameWorld world,  int mapSize) {
         this.enemies = enemies;
         this.player = player;
         this.map = map;
         this.world = world;
         this.executor = Executors.newCachedThreadPool();
         this.isRunning = new AtomicBoolean(true);
+        this.mapSize = mapSize;
     }
 
     /**
@@ -36,7 +38,7 @@ public class EnemyManager {
      */
     public void startAll() {
         for (Enemy enemy : enemies) {
-            executor.submit(new EnemyThread(enemy, player, map, world, isRunning));
+            executor.submit(new EnemyThread(enemy, player, map, world, isRunning, mapSize));
         }
     }
 
