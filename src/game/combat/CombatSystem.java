@@ -53,7 +53,15 @@ public class CombatSystem {
         GameLogger.log("Combat: " + attacker.getDisplaySymbol() + " dealt " + damageDealt +
                 " to " + defender.getDisplaySymbol() + ". Remaining HP: " + postHP);
 
+        // Enemy attacks run on their own threads, so nothing else refreshes the status display
+        // after a non-fatal hit on the player. Notify the listeners so the shown HP stays current.
+        if (!defender.isDead() && defender instanceof PlayerCharacter && attacker instanceof Enemy) {
+            world.getMap().notifyListeners();
+        }
+
         if (defender.isDead()) {
+            // Refresh the GUI first: defeat() may show the Game Over dialog and exit the game.
+            world.getMap().notifyListeners();
             defender.defeat();
             GameLogger.log("Combat: " + defender.getDisplaySymbol() + " defeated at " + defenderPos);
 
@@ -90,6 +98,8 @@ public class CombatSystem {
                     " in retaliation. " + attacker.getDisplaySymbol() + " now has " + attackerHPAfter + " HP.");
 
             if (attacker instanceof PlayerCharacter pc && attacker.isDead()) {
+                // The counterattack killed the player: refresh the GUI before Game Over is shown.
+                world.getMap().notifyListeners();
                 pc.defeat();
             }
         }

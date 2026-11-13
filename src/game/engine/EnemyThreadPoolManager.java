@@ -25,12 +25,13 @@ public class EnemyThreadPoolManager {
     private final GameWorld world;
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private final Random random = new Random();
+    private final int mapSize;
 
-    public EnemyThreadPoolManager(PlayerCharacter player, GameMap map, GameWorld world) {
+    public EnemyThreadPoolManager(PlayerCharacter player, GameMap map, GameWorld world, int mapSize) {
         this.player = player;
         this.map = map;
         this.world = world;
-
+        this.mapSize = mapSize;
         int poolSize = calculatePoolSize(map);
         this.threadPool = Executors.newFixedThreadPool(poolSize);
     }
@@ -54,7 +55,7 @@ public class EnemyThreadPoolManager {
         map.addEntity(enemy);
         activeEnemies.add(enemy);
 
-        EnemyThread task = new EnemyThread(enemy, player, map, world, isRunning) {
+        EnemyThread task = new EnemyThread(enemy, player, map, world, isRunning, mapSize) {
             @Override
             public void run() {
                 super.run(); // הפעולה המקורית
@@ -77,8 +78,8 @@ public class EnemyThreadPoolManager {
     private Position getRandomFreePosition() {
         // לוגיקה פשוטה למציאת מיקום פנוי (אפשר לשפר לפי הצורך)
         for (int i = 0; i < 100; i++) {
-            int row = random.nextInt(10);
-            int col = random.nextInt(10);
+            int row = random.nextInt(mapSize);
+            int col = random.nextInt(mapSize);
             Position pos = new Position(row, col);
             if (!map.isOccupied(pos)) {
                 return pos;

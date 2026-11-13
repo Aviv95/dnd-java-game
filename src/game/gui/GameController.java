@@ -47,6 +47,9 @@ public class GameController implements MapPanel.MapClickListener {
         this.mapPanel = mapPanel;
         this.statusPanel = statusPanel;
 
+        // Refresh the status display whenever the map announces a change (e.g. just before defeat)
+        gameMap.addListener(() -> statusPanel.updateStatus(player));
+
         this.mapPanel.setClickListener(this);
         mapPanel.refresh(player.getPosition());
         statusPanel.updateStatus(player);
